@@ -11,12 +11,14 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.SQLException;
 import java.util.Optional;
 
 @Slf4j
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class MemberServiceImpl implements MemberService {
 
@@ -44,6 +46,7 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public void registMember(MemberDto memberDto) {
 
+        log.info("regist member : {}", memberDto);
         try {
             Optional<MemberDto> m = getMemberByUsername(memberDto.getUsername());
 
@@ -62,8 +65,9 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public MemberDto loginMember(LoginVo loginVo) {
 
+        log.info("login vo : {}", loginVo);
         Optional<MemberDto> m = getMemberByUsername(loginVo.getUsername());
-
+        log.info("Optional member : {}", m);
         if (!m.isPresent()) {
             throw new UsernameNotFoundException("존재하지 않는 사용자입니다.");
         }

@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -26,7 +27,7 @@ public class MemberController {
     private final MemberService memberService;
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(LoginVo loginVo) {
+    public ResponseEntity<?> login(@RequestBody LoginVo loginVo) {
 
         MemberDto member = memberService.loginMember(loginVo);
 
@@ -38,8 +39,9 @@ public class MemberController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<?> signup(SignupVo signupVo) {
+    public ResponseEntity<?> signup(@RequestBody SignupVo signupVo) {
 
+        log.info("controller signup : {}", signupVo);
         MemberDto memberDto = new MemberDto();
         memberDto.setUsername(signupVo.getUsername());
         memberDto.setPassword(signupVo.getPassword());

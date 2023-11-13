@@ -6,10 +6,12 @@ import com.example.demo.member.service.MemberService;
 import com.example.demo.security.authentication.UsernamePasswordAuthentication;
 import com.example.demo.security.proxy.AuthenticationServerProxy;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -30,6 +32,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class CustomUsernamePasswordAuthenticationFilter extends OncePerRequestFilter {
@@ -37,7 +40,7 @@ public class CustomUsernamePasswordAuthenticationFilter extends OncePerRequestFi
     private final MemberService memberService;
     private final AuthenticationServerProxy serverProxy;
 
-    @Value("jwt.signing.key")
+    @Value("${jwt.signing.key}")
     private String signingKey;
 
     private final String TOKEN_PREFIX = "bearer ";
@@ -45,7 +48,14 @@ public class CustomUsernamePasswordAuthenticationFilter extends OncePerRequestFi
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
+        log.info("Custom Filtering...");
         LoginVo loginVo = getLoginVo(request);
+
+        if (loginVo == null) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Bad Request");
+            return;
+        }
+
         MemberDto member = memberService.loginMember(loginVo);
 
         if (member != null) {
@@ -76,11 +86,17 @@ public class CustomUsernamePasswordAuthenticationFilter extends OncePerRequestFi
 
         ObjectMapper mapper = new ObjectMapper();
 
-        return mapper.readValue(sb.toString(), LoginVo.class);
+        try {
+            return mapper.readValue(sb.toString(), LoginVo.class);
+        } catch (MismatchedInputException e) {
+            return null;
+        }
     }
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-        return !request.getServletPath().equals("/login");
+        String path = request.getServletPath();
+        log.info("Filter get servlet path : {}", path);
+        return !path.equals("/login") && !path.equals("/login/");
     }
 }
