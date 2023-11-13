@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper>
+    <select id="findById" parameterType="int" resultType="MemberDto">
+        select
+            user_id, password, username, email, type
+        from
+            members
+        where
+            user_id = #{userId}
+    </select>
+
+    <select id="findByUsername" parameterType="String" resultType="MemberDto">
+        select
+            user_id, password, username, email, type
+        from
+            members
+        where
+            user_id = #{username}
+    </select>
+
+    <insert id="insertMember" parameterType="MemberDto">
+        insert into members (username, password, email, type)
+        values (#{username}, #{password}, #{email}, #{type})
+    </insert>
+</mapper>
