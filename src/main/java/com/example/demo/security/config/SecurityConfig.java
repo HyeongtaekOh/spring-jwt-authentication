@@ -1,6 +1,7 @@
 package com.example.demo.security.config;
 
 import com.example.demo.security.filter.CustomUsernamePasswordAuthenticationFilter;
+import com.example.demo.security.filter.JwtAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,20 +15,23 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.client.RestTemplate;
 
 @Configuration
-@EnableWebSecurity(debug = true)
+//@EnableWebSecurity(debug = true)
 public class SecurityConfig {
 
+//    @Autowired
+//    CustomUsernamePasswordAuthenticationFilter customUsernamePasswordAuthenticationFilter;
+
     @Autowired
-    CustomUsernamePasswordAuthenticationFilter customUsernamePasswordAuthenticationFilter;
+    JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.csrf().disable();
-        http.addFilterAt(customUsernamePasswordAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-
-        http.authorizeHttpRequests(auth -> auth
-                .mvcMatchers("/member/signup").permitAll()
-                .anyRequest().authenticated())
+        http.csrf().disable()
+                .addFilterAt(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .authorizeHttpRequests(auth -> auth
+                    .mvcMatchers("/signup", "/login").permitAll()
+                    .anyRequest().authenticated()
+                )
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
         return http.build();

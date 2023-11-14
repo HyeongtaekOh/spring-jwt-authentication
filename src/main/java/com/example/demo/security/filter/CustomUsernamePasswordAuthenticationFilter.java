@@ -33,7 +33,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Slf4j
-@Component
+//@Component
 @RequiredArgsConstructor
 public class CustomUsernamePasswordAuthenticationFilter extends OncePerRequestFilter {
 
@@ -43,7 +43,7 @@ public class CustomUsernamePasswordAuthenticationFilter extends OncePerRequestFi
     @Value("${jwt.signing.key}")
     private String signingKey;
 
-    private final String TOKEN_PREFIX = "bearer ";
+    private final String TOKEN_PREFIX = "Bearer ";
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
