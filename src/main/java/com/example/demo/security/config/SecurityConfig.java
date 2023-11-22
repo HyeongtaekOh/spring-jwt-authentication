@@ -21,15 +21,12 @@ public class SecurityConfig {
 //    @Autowired
 //    CustomUsernamePasswordAuthenticationFilter customUsernamePasswordAuthenticationFilter;
 
-    @Autowired
-    JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf().disable()
-                .addFilterAt(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
-                    .mvcMatchers("/signup", "/login").permitAll()
+                    .mvcMatchers("/*").permitAll()
                     .anyRequest().authenticated()
                 )
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
